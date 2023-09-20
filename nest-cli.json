@@ -1,8 +1,50 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/health-connect-back/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/health-connect-back/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/health-connect-back",
+  "projects": {
+    "health-connect-back": {
+      "type": "application",
+      "root": "apps/health-connect-back",
+      "entryFile": "main",
+      "sourceRoot": "apps/health-connect-back/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/health-connect-back/tsconfig.app.json"
+      }
+    },
+    "glycemic-control": {
+      "type": "application",
+      "root": "apps/glycemic-control",
+      "entryFile": "main",
+      "sourceRoot": "apps/glycemic-control/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/glycemic-control/tsconfig.app.json"
+      }
+    },
+    "prisma": {
+      "type": "library",
+      "root": "libs/prisma",
+      "entryFile": "index",
+      "sourceRoot": "libs/prisma/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/prisma/tsconfig.lib.json"
+      }
+    },
+    "auth": {
+      "type": "library",
+      "root": "libs/auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+      }
+    }
   }
 }

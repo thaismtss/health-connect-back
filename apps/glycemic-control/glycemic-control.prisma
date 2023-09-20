@@ -1,0 +1,18 @@
+
+
+model Glycemic {
+  id      String     @id @default(uuid())
+  value   Float
+  fasting Boolean
+  status  String
+  userId  String
+  user    User       @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("glycemics")
+}  
+
+model User {
+  id  String @id
+  glycemics Glycemic[]
+}

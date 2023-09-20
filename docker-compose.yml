@@ -2,9 +2,30 @@ version: '3.7'
 services:
   postgres:
     image: postgres:14
-    restart: always
+    container_name: postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
       - '5432:5432'
+
+  health-connect-api:
+    container_name: health-connect-api
+    build:
+      context: .
+      dockerfile: ./apps/health-connect-back/Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+
+  glycemic-control-api:
+    container_name: glycemic-control-api
+    build:
+      context: .
+      dockerfile: ./apps/glycemic-control/Dockerfile
+    ports:
+      - '4000:4000'
+    depends_on:
+      - postgres
+      - health-connect-api
