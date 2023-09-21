@@ -1,12 +1,20 @@
 import { PrismaService } from '@app/prisma';
 import { Injectable, Req } from '@nestjs/common';
-import { IUserRequest } from 'common/interfaces';
+import {
+  IUserRequest,
+  Response,
+  ResponseWithData,
+  Services,
+} from 'common/interfaces';
 
 @Injectable()
 export class ServicesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async connectServiceOnUser(@Req() request: IUserRequest, serviceId: string) {
+  async connectServiceOnUser(
+    @Req() request: IUserRequest,
+    serviceId: string,
+  ): Promise<Response> {
     const user = request['user'];
     const userId = user?.userId;
     await this.prisma.servicesOnUsers.create({
@@ -29,7 +37,7 @@ export class ServicesService {
     };
   }
 
-  async listServices() {
+  async listServices(): Promise<ResponseWithData<Services[]>> {
     const services = await this.prisma.services.findMany();
 
     return {
@@ -38,7 +46,9 @@ export class ServicesService {
     };
   }
 
-  async listServicesByUser(@Req() request: IUserRequest) {
+  async listServicesByUser(
+    @Req() request: IUserRequest,
+  ): Promise<ResponseWithData<Services[]>> {
     const user = request['user'];
     const userId = user?.userId;
     const services = await this.prisma.servicesOnUsers.findMany({
@@ -52,7 +62,9 @@ export class ServicesService {
 
     return {
       success: true,
-      data: services,
+      data: services.map((service) => ({
+        ...service.service,
+      })),
     };
   }
 }

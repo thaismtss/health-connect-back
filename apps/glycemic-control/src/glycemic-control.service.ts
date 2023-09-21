@@ -1,7 +1,13 @@
 import { Injectable, Req } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import { Prisma } from '@prisma/client';
-import { IUserRequest } from 'common/interfaces';
+import {
+  GlycemicControl,
+  IUserRequest,
+  Response,
+  ResponseError,
+  ResponseWithData,
+} from 'common/interfaces';
 
 @Injectable()
 export class GlycemicControlService {
@@ -66,10 +72,10 @@ export class GlycemicControlService {
   async insertGlucoseControl(
     @Req() request: IUserRequest,
     data: Pick<Prisma.GlycemicCreateInput, 'value' | 'fasting'>,
-  ): Promise<any> {
+  ): Promise<Response | ResponseError> {
     const user = request['user'];
     const userId = user?.userId;
-    await this.prisma.glycemic.create({
+    const insert = await this.prisma.glycemic.create({
       data: {
         ...data,
         status: this.getStatusGlycemic(data.value, data.fasting),
@@ -80,6 +86,14 @@ export class GlycemicControlService {
         },
       },
     });
+    if (!insert) {
+      return {
+        success: false,
+        error: {
+          message: 'Error to insert glycemic control',
+        },
+      };
+    }
     return {
       success: true,
     };
@@ -89,7 +103,7 @@ export class GlycemicControlService {
     @Req() request: IUserRequest,
     startDate: string,
     endDate: string,
-  ): Promise<any> {
+  ): Promise<ResponseWithData<GlycemicControl>> {
     const user = request['user'];
     const userId = user?.userId;
     const glycemic = await this.prisma.glycemic.findMany({
@@ -111,8 +125,8 @@ export class GlycemicControlService {
       data: {
         glycemic,
         average: this.getAverageGlycemic(glycemic),
-        maxValue: this.getMaxGlycemic(glycemic),
-        minValue: this.getMinGlycemic(glycemic),
+        max: this.getMaxGlycemic(glycemic),
+        min: this.getMinGlycemic(glycemic),
       },
     };
   }
