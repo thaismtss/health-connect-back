@@ -6,17 +6,40 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  output   = "./src/generated/client"
+}
+
+model Services {
+  id              String            @id @default(uuid())
+  name            String
+  description     String
+  slug            String
+  ServicesOnUsers ServicesOnUsers[] @relation(name: "ServicesToServicesOnUsers")
+
+  @@map("services")
+}
+
+model ServicesOnUsers {
+  id        String    @id @default(uuid())
+  userId    String
+  serviceId String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  removedAt DateTime?
+  user      User      @relation(name: "ServicesOnUsersToUser", fields: [userId], references: [id])
+  service   Services  @relation(name: "ServicesToServicesOnUsers", fields: [serviceId], references: [id])
+
+  @@map("services_on_users")
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
+  id        String            @id @default(uuid())
+  services  ServicesOnUsers[] @relation(name: "ServicesOnUsersToUser")
+  email     String            @unique
   name      String?
   password  String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  glycemics Glycemic[] @relation(name: "GlycemicToUser")
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  glycemics Glycemic[]        @relation(name: "GlycemicToUser")
 
   @@map("users")
 }

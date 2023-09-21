@@ -2,10 +2,19 @@ import { Module } from '@nestjs/common';
 import { UserModule } from './core/user/user.module';
 
 import { PrismaModule } from '@app/prisma';
-import { AuthModule } from './authentication/auth.module';
-import { AuthModule as AuthenticationModule } from '@app/auth';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { AuthModule } from '@app/auth';
+import { ServicesModule } from './core/services/services.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [UserModule, AuthModule, PrismaModule, AuthenticationModule],
+  imports: [
+    UserModule,
+    ServicesModule,
+    AuthenticationModule,
+    PrismaModule,
+    AuthModule,
+    JwtModule.register({ global: true }),
+  ],
 })
 export class AppModule {}

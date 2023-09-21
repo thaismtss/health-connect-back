@@ -33,6 +33,36 @@ export class GlycemicControlService {
     return 'DIABETES';
   }
 
+  private getAverageGlycemic(glycemic: Prisma.GlycemicWhereInput[]): number {
+    const sum = glycemic.reduce(
+      (acc, curr) => (typeof curr.value === 'number' ? acc + curr.value : 0),
+      0,
+    );
+    return (sum / glycemic.length).toFixed(2) as any;
+  }
+
+  private getMaxGlycemic(glycemic: Prisma.GlycemicWhereInput[]): number {
+    return Math.max(
+      ...glycemic.map((glycemic) => {
+        if (typeof glycemic.value === 'number') {
+          return glycemic.value;
+        }
+        return 0;
+      }),
+    );
+  }
+
+  private getMinGlycemic(glycemic: Prisma.GlycemicWhereInput[]): number {
+    return Math.min(
+      ...glycemic.map((glycemic) => {
+        if (typeof glycemic.value === 'number') {
+          return glycemic.value;
+        }
+        return 0;
+      }),
+    );
+  }
+
   async insertGlucoseControl(
     @Req() request: IUserRequest,
     data: Pick<Prisma.GlycemicCreateInput, 'value' | 'fasting'>,
@@ -76,6 +106,14 @@ export class GlycemicControlService {
       },
     });
 
-    return glycemic;
+    return {
+      success: true,
+      data: {
+        glycemic,
+        average: this.getAverageGlycemic(glycemic),
+        maxValue: this.getMaxGlycemic(glycemic),
+        minValue: this.getMinGlycemic(glycemic),
+      },
+    };
   }
 }

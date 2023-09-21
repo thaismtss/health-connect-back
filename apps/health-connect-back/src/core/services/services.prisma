@@ -1,0 +1,27 @@
+model Services {
+  id              String            @id @default(uuid())
+  name            String
+  description     String
+  slug            String
+  ServicesOnUsers ServicesOnUsers[]
+
+  @@map("services")
+}
+
+model ServicesOnUsers {
+  id        String    @id @default(uuid())
+  userId    String
+  serviceId String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  removedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id])
+  service   Services  @relation(fields: [serviceId], references: [id])
+
+  @@map("services_on_users")
+}
+
+model User {
+  id String @id
+  services ServicesOnUsers[]
+}
