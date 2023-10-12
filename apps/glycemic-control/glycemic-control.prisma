@@ -2,7 +2,7 @@
 
 model Glycemic {
   id      String     @id @default(uuid())
-  value   Float
+  value   String
   fasting Boolean
   status  String
   userId  String
