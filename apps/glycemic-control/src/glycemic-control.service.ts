@@ -13,17 +13,18 @@ import {
 export class GlycemicControlService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private getStatusGlycemic(value: number, fasting: boolean): string {
+  private getStatusGlycemic(value: string, fasting: boolean): string {
+    const parsedValue = parseFloat(value);
     const thresholds = {
       fasting: {
-        HIPLOGLICEMIA: value < 70,
-        NORMAL: value <= 100,
-        PREDIABETES: value <= 126,
+        HIPLOGLICEMIA: parsedValue < 70,
+        NORMAL: parsedValue <= 100,
+        PREDIABETES: parsedValue <= 126,
         DIABETES: true,
       },
       nonFasting: {
-        NORMAL: value <= 70,
-        PREDIABETES: value <= 140,
+        NORMAL: parsedValue <= 70,
+        PREDIABETES: parsedValue <= 140,
         DIABETES: true,
       },
     };
@@ -40,20 +41,14 @@ export class GlycemicControlService {
   }
 
   private getAverageGlycemic(glycemic: Prisma.GlycemicWhereInput[]): number {
-    const sum = glycemic.reduce(
-      (acc, curr) => (typeof curr.value === 'number' ? acc + curr.value : 0),
-      0,
-    );
+    const sum = glycemic.reduce((acc, curr) => acc + Number(curr.value), 0);
     return (sum / glycemic.length).toFixed(2) as any;
   }
 
   private getMaxGlycemic(glycemic: Prisma.GlycemicWhereInput[]): number {
     return Math.max(
       ...glycemic.map((glycemic) => {
-        if (typeof glycemic.value === 'number') {
-          return glycemic.value;
-        }
-        return 0;
+        return Number(glycemic.value);
       }),
     );
   }
@@ -61,10 +56,7 @@ export class GlycemicControlService {
   private getMinGlycemic(glycemic: Prisma.GlycemicWhereInput[]): number {
     return Math.min(
       ...glycemic.map((glycemic) => {
-        if (typeof glycemic.value === 'number') {
-          return glycemic.value;
-        }
-        return 0;
+        return Number(glycemic.value);
       }),
     );
   }
@@ -106,15 +98,18 @@ export class GlycemicControlService {
   ): Promise<ResponseWithData<GlycemicControl>> {
     const user = request['user'];
     const userId = user?.userId;
+    const where = {
+      userId,
+    };
+
+    if (startDate && endDate) {
+      where['createdAt'] = {
+        gte: new Date(startDate).toISOString().split('T')[0] + 'T00:00:00.000Z',
+        lte: new Date(endDate).toISOString().split('T')[0] + 'T23:59:59.000Z',
+      };
+    }
     const glycemic = await this.prisma.glycemic.findMany({
-      where: {
-        userId,
-        createdAt: {
-          gte:
-            new Date(startDate).toISOString().split('T')[0] + 'T00:00:00.000Z',
-          lte: new Date(endDate).toISOString().split('T')[0] + 'T23:59:59.000Z',
-        },
-      },
+      where,
       orderBy: {
         createdAt: 'desc',
       },
