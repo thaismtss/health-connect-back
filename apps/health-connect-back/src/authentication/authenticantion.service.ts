@@ -22,7 +22,10 @@ export class AuthenticationService {
 
       return {
         success: true,
-        data: token,
+        data: {
+          accessToken: token.accessToken,
+          name: user.name || '',
+        },
       };
     }
     throw new UnauthorizedException('User or Password Invalid');

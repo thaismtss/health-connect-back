@@ -17,6 +17,7 @@ export interface ResponseError {
 export interface ResponseLogin
   extends ResponseWithData<{
     accessToken: string;
+    name: string;
   }> {}
 
 export interface IUserRequest extends Express.Request {
@@ -27,7 +28,7 @@ export interface IUserRequest extends Express.Request {
 
 export interface Glycemic {
   id: string;
-  value: number;
+  value: string;
   fasting: boolean;
   status: string;
   createdAt: Date;
