@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { AuthGuard } from '@app/auth';
 import { IUserRequest } from 'common/interfaces';
+import { ConnectServiceDto } from './dto/connect.dto';
 
 @Controller('services')
 export class ServicesController {
@@ -11,9 +12,9 @@ export class ServicesController {
   @Post('connect')
   connectService(
     @Req() request: IUserRequest,
-    @Query('serviceId') serviceId: string,
+    @Body() body: ConnectServiceDto,
   ) {
-    return this.servicesService.connectServiceOnUser(request, serviceId);
+    return this.servicesService.connectServiceOnUser(request, body.serviceId);
   }
 
   @UseGuards(AuthGuard)
