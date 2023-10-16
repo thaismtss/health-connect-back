@@ -9,6 +9,11 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - '5432:5432'
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-q', '-d', 'postgres', '-U', 'postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   health-connect-api:
     container_name: health-connect-api
@@ -18,7 +23,8 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   glycemic-control-api:
     container_name: glycemic-control-api
@@ -28,5 +34,4 @@ services:
     ports:
       - '4000:4000'
     depends_on:
-      - postgres
       - health-connect-api
