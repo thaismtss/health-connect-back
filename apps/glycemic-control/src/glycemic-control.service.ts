@@ -61,6 +61,17 @@ export class GlycemicControlService {
     );
   }
 
+  private getDate(date: Date): string {
+    return new Intl.DateTimeFormat('pt-BR').format(date);
+  }
+
+  private getTime(date: Date): string {
+    return new Intl.DateTimeFormat('pt-BR', {
+      hour: 'numeric',
+      minute: 'numeric',
+    }).format(date);
+  }
+
   async insertGlucoseControl(
     @Req() request: IUserRequest,
     data: Pick<Prisma.GlycemicCreateInput, 'value' | 'fasting'>,
@@ -115,10 +126,16 @@ export class GlycemicControlService {
       },
     });
 
+    const mappedGlycemic = glycemic.map((glycemic) => ({
+      ...glycemic,
+      date: this.getDate(glycemic.createdAt),
+      time: this.getTime(glycemic.createdAt),
+    }));
+
     return {
       success: true,
       data: {
-        glycemic,
+        glycemic: mappedGlycemic,
         average: this.getAverageGlycemic(glycemic),
         max: this.getMaxGlycemic(glycemic),
         min: this.getMinGlycemic(glycemic),

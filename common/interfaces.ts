@@ -32,6 +32,8 @@ export interface Glycemic {
   fasting: boolean;
   status: string;
   createdAt: Date;
+  date: string;
+  time: string;
 }
 
 export interface GlycemicControl {
