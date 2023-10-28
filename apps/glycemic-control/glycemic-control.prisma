@@ -7,7 +7,7 @@ model Glycemic {
   status  String
   userId  String
   user    User       @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
+  createdAt DateTime 
 
   @@map("glycemics")
 }  

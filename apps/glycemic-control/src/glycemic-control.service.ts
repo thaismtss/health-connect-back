@@ -66,11 +66,11 @@ export class GlycemicControlService {
   }
 
   private getTime(date: Date): string {
-    date.setHours(date.getHours() - 3);
+    const newDate = new Date(date).setHours(date.getHours() - 3);
     return new Intl.DateTimeFormat('pt-BR', {
       hour: 'numeric',
       minute: 'numeric',
-    }).format(date);
+    }).format(newDate);
   }
 
   async insertGlucoseControl(
@@ -79,10 +79,16 @@ export class GlycemicControlService {
   ): Promise<Response | ResponseError> {
     const user = request['user'];
     const userId = user?.userId;
+    const dateNow = new Date();
+    const fusoHorarioCorreto = 'America/Sao_Paulo';
+
+    dateNow.toLocaleString('en-US', { timeZone: fusoHorarioCorreto });
+    console.log(dateNow);
     const insert = await this.prisma.glycemic.create({
       data: {
         ...data,
         status: this.getStatusGlycemic(data.value, data.fasting),
+        createdAt: dateNow,
         user: {
           connect: {
             id: userId,
