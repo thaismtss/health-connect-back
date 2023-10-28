@@ -1,0 +1,12 @@
+{
+  "mixers": [
+    {
+      "input": [
+        "./prisma/base.prisma",
+        "./apps/health-connect-back/src/**/*.prisma",
+        "./apps/**/*.prisma"
+      ],
+      "output": "./prisma/schema.prisma"
+    }
+  ]
+}
