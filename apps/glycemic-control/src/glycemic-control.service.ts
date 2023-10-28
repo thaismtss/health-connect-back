@@ -66,6 +66,7 @@ export class GlycemicControlService {
   }
 
   private getTime(date: Date): string {
+    date.setHours(date.getHours() - 3);
     return new Intl.DateTimeFormat('pt-BR', {
       hour: 'numeric',
       minute: 'numeric',
