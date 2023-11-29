@@ -19,13 +19,14 @@ export class GlycemicControlService {
       fasting: {
         HIPLOGLICEMIA: parsedValue < 70,
         NORMAL: parsedValue <= 100,
-        PREDIABETES: parsedValue <= 126,
-        DIABETES: true,
+        PREDIABETES: parsedValue > 100 && parsedValue <= 126,
+        DIABETES: parsedValue > 126,
       },
       nonFasting: {
-        NORMAL: parsedValue <= 70,
-        PREDIABETES: parsedValue <= 140,
-        DIABETES: true,
+        HIPLOGLICEMIA: parsedValue < 70,
+        NORMAL: parsedValue > 70 && parsedValue < 140,
+        PREDIABETES: parsedValue >= 140 && parsedValue <= 200,
+        DIABETES: parsedValue > 200,
       },
     };
 
